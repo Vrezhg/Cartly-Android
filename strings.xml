@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Carty1.0</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="select_pickUp">Select PickUp Location</string>
+    <string name="select_dropOff">Select Drop Off Location</string>
+    <string name="create_button">"Create Route</string>
+    <string-array name="start_array">
+        <item>Oviatt Library</item>
+        <item>Jacaranda Hall</item>
+        <item>Matador Bookstore</item>
+        <item>Sierra Hall</item>
+        <item>Live Oak Hall</item>
+    </string-array>
+    <string-array name="destination_array">
+        <item>Matador Bookstore</item>
+        <item>Oviatt Library</item>
+        <item>Jacaranda Hall</item>
+        <item>Sierra Hall</item>
+        <item>Live Oak Hall</item>
+    </string-array>
+</resources>
