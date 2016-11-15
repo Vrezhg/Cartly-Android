@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MapTest</string>
+    <string name="title_activity_map">mapActivity</string>
+    <string name="normal">normal</string>
+    <string name="satellite">satellite</string>
+    <string name="terrain">terrain</string>
+    <string name="hybrid">hybrid</string>
+    <string name="myLocation">My location</string>
+    <string name="Carty">Carty</string>
+    <string name="goToMap">Go to map</string>
+</resources>
