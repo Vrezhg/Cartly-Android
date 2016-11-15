@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/mapTypeNormal"
+        android:title="@string/normal" />
+    <item
+        android:id="@+id/mapTypeSatellite"
+        android:title="@string/satellite" />
+    <item
+        android:id="@+id/mapTypeTerrain"
+        android:title="@string/terrain" />
+    <item
+        android:id="@+id/mapTypeHybrid"
+        android:title="@string/hybrid" />
+    <item android:id="@+id/currentLocation"
+          android:title="@string/myLocation"
+          app:showAsAction="always"
+          android:onClick="showCurrentLocation"/>
+
+
+</menu>
