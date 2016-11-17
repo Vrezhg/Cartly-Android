@@ -8,4 +8,23 @@
     <string name="myLocation">My location</string>
     <string name="Carty">Carty</string>
     <string name="goToMap">Go to map</string>
+    <string name="create_button">create_button</string>
+    <string name="select_dropOff">select_dropOff</string>
+    <string name="select_pickUp">select_pickUp</string>
+    <string-array name="start_array">
+        <item></item>
+        <item>Oviatt Library</item>
+        <item>Jacaranda Hall</item>
+        <item>Matador Bookstore</item>
+        <item>Sierra Hall</item>
+        <item>Live Oak Hall</item>
+    </string-array>
+    <string-array name="destination_array">
+        <item></item>
+        <item>Matador Bookstore</item>
+        <item>Oviatt Library</item>
+        <item>Jacaranda Hall</item>
+        <item>Sierra Hall</item>
+        <item>Live Oak Hall</item>
+    </string-array>
 </resources>
