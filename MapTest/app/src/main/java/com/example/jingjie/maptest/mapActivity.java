@@ -1,19 +1,19 @@
 package com.example.jingjie.maptest;
 
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.appdatasearch.GetRecentContextCall;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.identity.intents.Address;
@@ -24,45 +24,12 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.location.Location;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -85,9 +52,12 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private GoogleApiClient mLocationClient;
     //instanciate in inConnected method
     private LocationListener mListener;
-    private Marker marker1=null;
-    private Marker marker2=null;
+    private Marker markerS =null;
+    private Marker markerE =null;
     private Polyline  line;
+    private Intent i;
+    private String startPos;
+    private String endPos;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -111,7 +81,18 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
         if(initMap())
         {
-            Toast.makeText(this, "Ready to map!", Toast.LENGTH_SHORT).show();
+            i=getIntent();
+            startPos=i.getStringExtra("start");
+            endPos=i.getStringExtra("end");
+            //Toast.makeText(this, "Ready to map!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "From "+startPos+" to "+endPos, Toast.LENGTH_SHORT).show();
+            try
+            {
+                createPathByPassInPosition();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
             //mMap.setMyLocationEnabled(true);
             mLocationClient = new GoogleApiClient.Builder(this)
                     .addApi(LocationServices.API)
@@ -186,15 +167,15 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 MarkerOptions options = new MarkerOptions()
                         .position(new LatLng(latLng.latitude, latLng.longitude));
 
-                if(marker1==null)
-                    marker1 = mMap.addMarker(options);
-                else if(marker2==null)
+                if(markerS ==null)
+                    markerS = mMap.addMarker(options);
+                else if(markerE ==null)
                 {
-                    marker2 = mMap.addMarker(options);
-                    createPath();
+                    markerE = mMap.addMarker(options);
 
-                    LatLng origin = marker1.getPosition();
-                    LatLng dest = marker2.getPosition();
+
+                    LatLng origin = markerS.getPosition();
+                    LatLng dest = markerE.getPosition();
 
                     // Getting URL to the Google Directions API
                     String url = getUrl(origin, dest);
@@ -207,7 +188,7 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 else
                 {
                     removeEverything();
-                    marker1 = mMap.addMarker(options);
+                    markerS = mMap.addMarker(options);
                 }
 
 
@@ -467,17 +448,17 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         MarkerOptions options = new MarkerOptions()
                 .position(new LatLng(lat, lng));
 
-        if(marker1==null)
-            marker1 = mMap.addMarker(options);
-        else if(marker2==null)
+        if(markerS ==null)
+            markerS = mMap.addMarker(options);
+        else if(markerE ==null)
         {
-            marker2 = mMap.addMarker(options);
+            markerE = mMap.addMarker(options);
             createPath();
         }
         else
         {
             removeEverything();
-            marker1 = mMap.addMarker(options);
+            markerS = mMap.addMarker(options);
         }
     }
 
@@ -487,12 +468,68 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     private void removeEverything() {
-        marker1.remove();
-        marker1 = null;
-        marker2.remove();
-        marker2 = null;
-        line.remove();
-        line=null;
+        if(markerS!=null)
+        {
+            markerS.remove();
+            markerS = null;
+        }
+        if(markerE!=null)
+        {
+            markerE.remove();
+            markerE = null;
+        }
+        if(line!=null)
+        {
+            line.remove();
+            line = null;
+        }
+    }
+
+    private void createPathByPassInPosition() throws IOException
+    {
+        removeEverything();
+        Geocoder gc = new Geocoder(this);
+        LocationData loc=new LocationData();
+        if(!startPos.equals(""))
+        {
+            String[] str=loc.getLocation(startPos);
+            double lat = Double.parseDouble(str[1]);
+            double lng = Double.parseDouble(str[2]);
+
+
+            MarkerOptions options=new MarkerOptions()
+                    .position(new LatLng(lat,lng));
+            markerS=mMap.addMarker(options);
+            //Toast.makeText(this,"Start : "+markerS.getPosition().latitude+","+markerS.getPosition().longitude,Toast.LENGTH_LONG).show();
+        }
+        if(!endPos.equals(""))
+        {
+            String[] str=loc.getLocation(endPos);
+            double lat = Double.parseDouble(str[1]);
+            double lng = Double.parseDouble(str[2]);
+
+
+
+            MarkerOptions options=new MarkerOptions()
+                    .position(new LatLng(lat,lng));
+            markerE=mMap.addMarker(options);
+            //Toast.makeText(this,"End : "+markerE.getPosition().latitude+","+markerE.getPosition().longitude,Toast.LENGTH_LONG).show();
+        }
+
+        if(markerE!=null&&markerS!=null)
+        {
+            LatLng origin = markerS.getPosition();
+            LatLng dest = markerE.getPosition();
+
+            // Getting URL to the Google Directions API
+            String url = getUrl(origin, dest);
+            Log.d("onMapLongClick", url.toString());
+            FetchUrl FetchUrl = new FetchUrl();
+
+            // Start downloading json data from Google Directions API
+            FetchUrl.execute(url);
+        }
+
     }
 
 
