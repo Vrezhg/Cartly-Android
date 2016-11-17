@@ -149,9 +149,11 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             mMap=mapFragment.getMap();
         }
+
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
+
                 Geocoder gc = new Geocoder(mapActivity.this);
                 List<android.location.Address> list = null;
 
@@ -168,22 +170,19 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                         .position(new LatLng(latLng.latitude, latLng.longitude));
 
                 if(markerS ==null)
+                {
+
                     markerS = mMap.addMarker(options);
+                    if(markerE !=null)
+                    {
+                        createPath();
+                    }
+                }
                 else if(markerE ==null)
                 {
+
                     markerE = mMap.addMarker(options);
-
-
-                    LatLng origin = markerS.getPosition();
-                    LatLng dest = markerE.getPosition();
-
-                    // Getting URL to the Google Directions API
-                    String url = getUrl(origin, dest);
-                    Log.d("onMapLongClick", url.toString());
-                    FetchUrl FetchUrl = new FetchUrl();
-
-                    // Start downloading json data from Google Directions API
-                    FetchUrl.execute(url);
+                    createPath();
                 }
                 else
                 {
@@ -464,7 +463,16 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
     private void createPath()
     {
+        LatLng origin = markerS.getPosition();
+        LatLng dest = markerE.getPosition();
 
+        // Getting URL to the Google Directions API
+        String url = getUrl(origin, dest);
+        Log.d("onMapLongClick", url.toString());
+        FetchUrl FetchUrl = new FetchUrl();
+
+        // Start downloading json data from Google Directions API
+        FetchUrl.execute(url);
     }
 
     private void removeEverything() {
