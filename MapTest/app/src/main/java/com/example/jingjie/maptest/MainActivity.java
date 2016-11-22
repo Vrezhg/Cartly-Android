@@ -20,6 +20,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     Button button;
+    Button button2;
     Spinner spinner1;
     Spinner spinner2;
     long start=0;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         addListenerOnButton();
+        addListenerOnButton2();
 
 
 
@@ -93,6 +95,18 @@ public class MainActivity extends AppCompatActivity {
                 Intent i=new Intent(MainActivity.this,mapActivity.class);
                 i.putExtra("start",startPos);
                 i.putExtra("end",endPos);
+                startActivity(i);
+            }
+        });
+    }
+    public void addListenerOnButton2(){
+        final Context context = this;
+        button2 = (Button)findViewById(R.id.button2);
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(MainActivity.this,EventsActivity.class);
                 startActivity(i);
             }
         });

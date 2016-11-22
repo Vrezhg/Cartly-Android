@@ -12,6 +12,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,7 +28,11 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.GroundOverlay;
+import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -52,12 +60,13 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private GoogleApiClient mLocationClient;
     //instanciate in inConnected method
     private LocationListener mListener;
-    private Marker markerS =null;
-    private Marker markerE =null;
-    private Polyline  line;
+    private Marker markerS = null;
+    private Marker markerE = null;
+    private Polyline line;
     private Intent i;
     private String startPos;
     private String endPos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -79,13 +88,14 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         });
         */
 
-        if(initMap())
+        if (initMap())
         {
-            i=getIntent();
-            startPos=i.getStringExtra("start");
-            endPos=i.getStringExtra("end");
+            i = getIntent();
+            startPos = i.getStringExtra("start");
+            endPos = i.getStringExtra("end");
             //Toast.makeText(this, "Ready to map!", Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "From "+startPos+" to "+endPos, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "From " + startPos + " to " + endPos, Toast.LENGTH_SHORT).show();
+            addOverLay();
             try
             {
                 createPathByPassInPosition();
@@ -101,25 +111,39 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                     .build();
 
             mLocationClient.connect();
+            Button bt=(Button)findViewById(R.id.button);
+            bt.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    try
+                    {
+                        geoLocate(v);
+                    } catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
-
-
-        }
-        else
+        } else
         {
             Toast.makeText(this, "Map not connected!", Toast.LENGTH_SHORT).show();
         }
 
     }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -142,30 +166,37 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         }
         return super.onOptionsItemSelected(item);
     }
+
     private boolean initMap()
     {
-        if(mMap==null)
+        if (mMap == null)
         {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-            mMap=mapFragment.getMap();
+            mMap = mapFragment.getMap();
         }
 
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener()
+        {
             @Override
-            public void onMapLongClick(LatLng latLng) {
+            public void onMapLongClick(LatLng latLng)
+            {
 
                 Geocoder gc = new Geocoder(mapActivity.this);
                 List<android.location.Address> list = null;
 
-                try {
+                try
+                {
                     list = gc.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                } catch (IOException e) {
+                } catch (IOException e)
+                {
                     e.printStackTrace();
                     return;
                 }
 
                 android.location.Address add = list.get(0);
                 //mapActivity.this.addMarker( latLng.latitude, latLng.longitude);
+                addMarker(latLng.latitude, latLng.longitude);
+                /*
                 MarkerOptions options = new MarkerOptions()
                         .position(new LatLng(latLng.latitude, latLng.longitude));
 
@@ -188,15 +219,16 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 {
                     removeEverything();
                     markerS = mMap.addMarker(options);
-                }
+                } */
 
 
             }
         });
-        return (mMap!=null);
+        return (mMap != null);
     }
 
-    private String getUrl(LatLng origin, LatLng dest) {
+    private String getUrl(LatLng origin, LatLng dest)
+    {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -207,7 +239,7 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
         // Sensor enabled
         String sensor = "sensor=false";
-        String mode="mode=walking";
+        String mode = "mode=walking";
         // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + "mode=walking";
 
@@ -220,14 +252,17 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
         return url;
     }
+
     /**
      * A method to download json data from url
      */
-    private String downloadUrl(String strUrl) throws IOException {
+    private String downloadUrl(String strUrl) throws IOException
+    {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;
-        try {
+        try
+        {
             URL url = new URL(strUrl);
 
             // Creating an http connection to communicate with url
@@ -244,7 +279,8 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
             StringBuffer sb = new StringBuffer();
 
             String line = "";
-            while ((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null)
+            {
                 sb.append(line);
             }
 
@@ -252,11 +288,11 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
             Log.d("downloadUrl", data.toString());
             br.close();
 
-        }
-        catch (Exception e) {
+        } catch (Exception e)
+        {
             Log.d("Exception", e.toString());
-        }
-        finally {
+        } finally
+        {
             iStream.close();
             urlConnection.disconnect();
         }
@@ -264,27 +300,31 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     // Fetches data from url passed
-    private class FetchUrl extends AsyncTask<String, Void, String> {
+    private class FetchUrl extends AsyncTask<String, Void, String>
+    {
 
         @Override
-        protected String doInBackground(String... url) {
+        protected String doInBackground(String... url)
+        {
 
             // For storing data from web service
             String data = "";
 
-            try {
+            try
+            {
                 // Fetching the data from web service
                 data = downloadUrl(url[0]);
                 Log.d("Background Task data", data.toString());
-            }
-            catch (Exception e) {
+            } catch (Exception e)
+            {
                 Log.d("Background Task", e.toString());
             }
             return data;
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(String result)
+        {
             super.onPostExecute(result);
 
             ParserTask parserTask = new ParserTask();
@@ -298,29 +338,32 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     /**
      * A class to parse the Google Places in JSON format
      */
-    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>> {
+    private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String, String>>>>
+    {
 
         // Parsing the data in non-ui thread
         @Override
-        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData) {
+        protected List<List<HashMap<String, String>>> doInBackground(String... jsonData)
+        {
 
             JSONObject jObject;
             List<List<HashMap<String, String>>> routes = null;
 
-            try {
+            try
+            {
                 jObject = new JSONObject(jsonData[0]);
-                Log.d("ParserTask",jsonData[0].toString());
+                Log.d("ParserTask", jsonData[0].toString());
                 DataParser parser = new DataParser();
                 Log.d("ParserTask", parser.toString());
 
                 // Starts parsing data
                 routes = parser.parse(jObject);
-                Log.d("ParserTask","Executing routes");
-                Log.d("ParserTask",routes.toString());
+                Log.d("ParserTask", "Executing routes");
+                Log.d("ParserTask", routes.toString());
 
-            }
-            catch (Exception e) {
-                Log.d("ParserTask",e.toString());
+            } catch (Exception e)
+            {
+                Log.d("ParserTask", e.toString());
                 e.printStackTrace();
             }
             return routes;
@@ -328,12 +371,14 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
         // Executes in UI thread, after the parsing process
         @Override
-        protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+        protected void onPostExecute(List<List<HashMap<String, String>>> result)
+        {
             ArrayList<LatLng> points;
             PolylineOptions lineOptions = null;
 
             // Traversing through all the routes
-            for (int i = 0; i < result.size(); i++) {
+            for (int i = 0; i < result.size(); i++)
+            {
                 points = new ArrayList<>();
                 lineOptions = new PolylineOptions();
 
@@ -341,7 +386,8 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 List<HashMap<String, String>> path = result.get(i);
 
                 // Fetching all the points in i-th route
-                for (int j = 0; j < path.size(); j++) {
+                for (int j = 0; j < path.size(); j++)
+                {
                     HashMap<String, String> point = path.get(j);
 
                     double lat = Double.parseDouble(point.get("lat"));
@@ -356,27 +402,26 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 lineOptions.width(10);
                 lineOptions.color(Color.RED);
 
-                Log.d("onPostExecute","onPostExecute lineoptions decoded");
+                Log.d("onPostExecute", "onPostExecute lineoptions decoded");
 
             }
 
             // Drawing polyline in the Google Map for the i-th route
-            if(lineOptions != null) {
-                line=mMap.addPolyline(lineOptions);
-            }
-            else {
-                Log.d("onPostExecute","without Polylines drawn");
+            if (lineOptions != null)
+            {
+                line = mMap.addPolyline(lineOptions);
+            } else
+            {
+                Log.d("onPostExecute", "without Polylines drawn");
             }
         }
     }
 
 
-
-
     @Override
     public void onConnected(Bundle bundle)
     {
-        mListener=new LocationListener()
+        mListener = new LocationListener()
         {
             @Override
             //this method will be called every time when location changes
@@ -390,19 +435,20 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
             }
         };
         //set up request
-        LocationRequest request=LocationRequest.create();
+        LocationRequest request = LocationRequest.create();
         //change properity of request object
         //set priority
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         //set interval,the amount of time between request,5 seconds here
         //set the interval in which you want to get locations
-        request.setInterval(5*60*1000);
+        request.setInterval(5 * 60 * 1000);
         //if a location is available sooner you can get it (i.e. another app is using the location services).
         request.setFastestInterval(1000);
 
         //register the request object
-        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient,request,mListener);
+        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, request, mListener);
     }
+
     //go to current location
     public void showCurrentLocation(MenuItem item)
     {
@@ -411,20 +457,20 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         if (currentLocation == null)
         {
             Toast.makeText(this, "Couldn't connect!", Toast.LENGTH_SHORT).show();
-        }
-        else
+        } else
         {
             LatLng latLng = new LatLng(
                     currentLocation.getLatitude(),
                     currentLocation.getLongitude()
             );
+            addMarker(currentLocation.getLatitude(),currentLocation.getLongitude());
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(
                     latLng, 16
             );
             mMap.animateCamera(update);
         }
-
     }
+
     @Override
     public void onConnectionSuspended(int i)
     {
@@ -436,27 +482,38 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     {
 
     }
+
     protected void onPause()
     {
         super.onPause();
         //when user exit the app,will turn off the request.
-        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient,mListener);
+        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, mListener);
     }
 
-    private void addMarker(double lat, double lng) {
+    private void addMarker(double lat, double lng)
+    {
         MarkerOptions options = new MarkerOptions()
                 .position(new LatLng(lat, lng));
 
-        if(markerS ==null)
-            markerS = mMap.addMarker(options);
-        else if(markerE ==null)
+        if (markerS == null)
         {
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            markerS = mMap.addMarker(options);
+            if (markerE != null)
+            {
+                createPath();
+            }
+        }
+        else if (markerE == null)
+        {
+
             markerE = mMap.addMarker(options);
             createPath();
         }
-        else
+        else if(markerE != null && markerS != null)
         {
             removeEverything();
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             markerS = mMap.addMarker(options);
         }
     }
@@ -475,18 +532,19 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         FetchUrl.execute(url);
     }
 
-    private void removeEverything() {
-        if(markerS!=null)
+    private void removeEverything()
+    {
+        if (markerS != null)
         {
             markerS.remove();
             markerS = null;
         }
-        if(markerE!=null)
+        if (markerE != null)
         {
             markerE.remove();
             markerE = null;
         }
-        if(line!=null)
+        if (line != null)
         {
             line.remove();
             line = null;
@@ -497,48 +555,111 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     {
         removeEverything();
         Geocoder gc = new Geocoder(this);
-        LocationData loc=new LocationData();
-        if(!startPos.equals(""))
+        LocationData loc = new LocationData();
+        if (!startPos.equals(""))
         {
-            String[] str=loc.getLocation(startPos);
-            double lat = Double.parseDouble(str[1]);
-            double lng = Double.parseDouble(str[2]);
+            Building building = loc.getLocation(startPos);
+            double lat = building.getLat();
+            double lng = building.getLng();
 
 
-            MarkerOptions options=new MarkerOptions()
-                    .position(new LatLng(lat,lng));
-            markerS=mMap.addMarker(options);
+            MarkerOptions options = new MarkerOptions()
+                    .position(new LatLng(lat, lng));
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            markerS = mMap.addMarker(options);
             //Toast.makeText(this,"Start : "+markerS.getPosition().latitude+","+markerS.getPosition().longitude,Toast.LENGTH_LONG).show();
         }
-        if(!endPos.equals(""))
+        if (!endPos.equals(""))
         {
-            String[] str=loc.getLocation(endPos);
-            double lat = Double.parseDouble(str[1]);
-            double lng = Double.parseDouble(str[2]);
+            Building building = loc.getLocation(endPos);
+            double lat = building.getLat();
+            double lng = building.getLng();
 
 
+            MarkerOptions options = new MarkerOptions()
+                    .position(new LatLng(lat, lng));
 
-            MarkerOptions options=new MarkerOptions()
-                    .position(new LatLng(lat,lng));
-            markerE=mMap.addMarker(options);
+            markerE = mMap.addMarker(options);
             //Toast.makeText(this,"End : "+markerE.getPosition().latitude+","+markerE.getPosition().longitude,Toast.LENGTH_LONG).show();
         }
 
-        if(markerE!=null&&markerS!=null)
+        if (markerE != null && markerS != null)
         {
-            LatLng origin = markerS.getPosition();
-            LatLng dest = markerE.getPosition();
-
-            // Getting URL to the Google Directions API
-            String url = getUrl(origin, dest);
-            Log.d("onMapLongClick", url.toString());
-            FetchUrl FetchUrl = new FetchUrl();
-
-            // Start downloading json data from Google Directions API
-            FetchUrl.execute(url);
+            createPath();
         }
-
     }
 
+    private void hideSoftKeyboard(View v)
+    {
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
 
+    public void geoLocate(View v) throws IOException
+    {
+        double lat=0;
+        double lng=0;
+        boolean isValid=false;
+        hideSoftKeyboard(v);
+
+        TextView tv = (TextView) findViewById(R.id.editText);
+        String searchString = (tv.getText().toString()).trim();
+        //Toast.makeText(this, "Searching for: " + searchString, Toast.LENGTH_SHORT).show();
+
+        LocationData lcd=new LocationData();
+        Building building=lcd.getLocation(searchString);
+        if(building!=null)
+        {
+            lat = building.getLat();
+            lng = building.getLng();
+            Toast.makeText(this, lat + "," + lng, Toast.LENGTH_SHORT).show();
+            gotoLocation(lat, lng, 17);
+            addMarker(lat, lng);
+        }
+
+        else
+        {
+
+            Geocoder gc = new Geocoder(this);
+            List<android.location.Address> list = gc.getFromLocationName(searchString, 1, 34.234927, -118.531747, 34.250429, -118.523326);
+            if (list.size() > 0)
+            {
+                //here we just ask for 1 result.so the first Address in the list is the result
+                android.location.Address add = list.get(0);
+                // getLocality() will return the name of the location in the Address object
+                String locality = add.getLocality();
+                String feature = add.getFeatureName();
+                //Toast.makeText(this, "Found: " + locality + feature, Toast.LENGTH_SHORT).show();
+                //ready to change the location that map show
+                lat = add.getLatitude();
+                lng = add.getLongitude();
+
+                Toast.makeText(this, lat + "," + lng, Toast.LENGTH_SHORT).show();
+                gotoLocation(lat, lng, 17);
+                addMarker(lat, lng);
+            } else
+            {
+                Toast.makeText(this, "Can not find the destination", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void gotoLocation(double lat, double lng, float zoom) {
+        LatLng latLng = new LatLng(lat, lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
+        mMap.moveCamera(update);
+    }
+    private void addOverLay()
+    {
+
+        LatLngBounds newarkBounds = new LatLngBounds(
+                new LatLng(34.235551, -118.533768),       // South west corner
+                new LatLng(34.257127, -118.523552));      // North east corner
+        GroundOverlayOptions newarkMap = new GroundOverlayOptions()
+                .image(BitmapDescriptorFactory.fromResource(R.drawable.map3))
+                .positionFromBounds(newarkBounds);
+
+// Add an overlay to the map, retaining a handle to the GroundOverlay object.
+        GroundOverlay imageOverlay = mMap.addGroundOverlay(newarkMap);
+    }
 }

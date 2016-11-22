@@ -11,6 +11,9 @@
     <string name="create_button">create_button</string>
     <string name="select_dropOff">select_dropOff</string>
     <string name="select_pickUp">select_pickUp</string>
+    <string name="enter_location">Enter location:</string>
+    <string name="carty">Carty</string>
+    <string name="Sports_Event">Sports Event</string>
     <string-array name="start_array">
         <item></item>
         <item>Oviatt Library</item>
