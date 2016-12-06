@@ -16,6 +16,10 @@
           android:title="@string/myLocation"
           app:showAsAction="always"
           android:onClick="showCurrentLocation"/>
+    <item android:id="@+id/navigation"
+          android:title="@string/navigation"
+          app:showAsAction="always"
+          android:onClick="navigation"/>
 
 
 </menu>

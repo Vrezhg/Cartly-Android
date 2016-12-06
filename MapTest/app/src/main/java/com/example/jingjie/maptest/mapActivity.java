@@ -66,6 +66,10 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     private Intent i;
     private String startPos;
     private String endPos;
+    private History h;
+    private String path;
+    private GroundOverlay imageOverlay;
+    private GroundOverlayOptions newarkMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,26 +79,14 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
+
 
         if (initMap())
         {
             i = getIntent();
             startPos = i.getStringExtra("start");
             endPos = i.getStringExtra("end");
-            //Toast.makeText(this, "Ready to map!", Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, "From " + startPos + " to " + endPos, Toast.LENGTH_SHORT).show();
+
             addOverLay();
             try
             {
@@ -103,7 +95,7 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
             {
                 e.printStackTrace();
             }
-            //mMap.setMyLocationEnabled(true);
+
             mLocationClient = new GoogleApiClient.Builder(this)
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
@@ -153,15 +145,19 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         {
             case R.id.mapTypeNormal:
                 mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                mMap.addGroundOverlay(newarkMap);
                 break;
             case R.id.mapTypeSatellite:
                 mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                imageOverlay.remove();
                 break;
             case R.id.mapTypeTerrain:
                 mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                imageOverlay.remove();
                 break;
             case R.id.mapTypeHybrid:
                 mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                imageOverlay.remove();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -196,34 +192,19 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 android.location.Address add = list.get(0);
                 //mapActivity.this.addMarker( latLng.latitude, latLng.longitude);
                 addMarker(latLng.latitude, latLng.longitude);
-                /*
-                MarkerOptions options = new MarkerOptions()
-                        .position(new LatLng(latLng.latitude, latLng.longitude));
-
-                if(markerS ==null)
-                {
-
-                    markerS = mMap.addMarker(options);
-                    if(markerE !=null)
-                    {
-                        createPath();
-                    }
-                }
-                else if(markerE ==null)
-                {
-
-                    markerE = mMap.addMarker(options);
-                    createPath();
-                }
-                else
-                {
-                    removeEverything();
-                    markerS = mMap.addMarker(options);
-                } */
-
 
             }
         });
+
+        //prepare to write history
+        path=this.getFilesDir().getPath().toString();
+        try
+        {
+            h=new History(path);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return (mMap != null);
     }
 
@@ -421,16 +402,48 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
     @Override
     public void onConnected(Bundle bundle)
     {
+
+    }
+
+    public void navigation(MenuItem item)
+    {
         mListener = new LocationListener()
         {
             @Override
             //this method will be called every time when location changes
             public void onLocationChanged(Location location)
             {
-                //"this" right now will be the listener object,and I'd need to walk up the tree to the MainActivity object.
-                //Toast.makeText(MainActivity.this,"Location changed: "+location.getLatitude()+" "+location.getLongitude(),Toast.LENGTH_SHORT).show();
-                //than change the map
-                //gotoLocation(location.getLatitude(),location.getLongitude(),15);
+
+                if(markerS!=null&&markerE==null)
+                {
+                    markerE=markerS;
+                    markerS.remove();
+                    markerS=null;
+                }
+
+                if(markerE!=null)
+                {
+                    //"this" right now will be the listener object,and I'd need to walk up the tree to the MainActivity object.
+                    Toast.makeText(mapActivity.this, "Location changed: " + location.getLatitude() + " " + location.getLongitude(), Toast.LENGTH_SHORT).show();
+                    //than change the map
+                    //gotoLocation(location.getLatitude(),location.getLongitude(),15);
+                    //updata path
+                    Double destinationLat=markerE.getPosition().latitude;
+                    Double destinationLng=markerE.getPosition().longitude;
+                    removeEverything();
+                    Double startLat=location.getLatitude();
+                    Double startLng=location.getLongitude();
+                    //markerS = null;
+                    //markerE = null;
+                    /*
+                    addMarker(startLat,startLng);
+                    addMarker(destinationLat,destinationLng);
+                    */
+
+                    addMarker(destinationLat,destinationLng);
+                    addMarker(startLat,startLng);
+
+                }
 
             }
         };
@@ -441,7 +454,7 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         //set interval,the amount of time between request,5 seconds here
         //set the interval in which you want to get locations
-        request.setInterval(5 * 60 * 1000);
+        request.setInterval(1 * 5 * 1000);
         //if a location is available sooner you can get it (i.e. another app is using the location services).
         request.setFastestInterval(1000);
 
@@ -449,14 +462,21 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient, request, mListener);
     }
 
+
+
     //go to current location
     public void showCurrentLocation(MenuItem item)
     {
+        if(mListener!=null)
+        {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, mListener);
+        }
+
         Location currentLocation = LocationServices.FusedLocationApi
                 .getLastLocation(mLocationClient);
         if (currentLocation == null)
         {
-            Toast.makeText(this, "Couldn't connect!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Couldn't connect! Please activate GPS.", Toast.LENGTH_SHORT).show();
         } else
         {
             LatLng latLng = new LatLng(
@@ -483,33 +503,43 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
     }
 
+
     protected void onPause()
     {
         super.onPause();
         //when user exit the app,will turn off the request.
-        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, mListener);
+        if(mListener!=null)
+        {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient, mListener);
+
+        }
     }
+
 
     private void addMarker(double lat, double lng)
     {
+
         MarkerOptions options = new MarkerOptions()
                 .position(new LatLng(lat, lng));
 
-        if (markerS == null)
+
+        if (markerE == null)
         {
-            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            markerS = mMap.addMarker(options);
-            if (markerE != null)
+            markerE = mMap.addMarker(options);
+            if (markerS != null)
             {
                 createPath();
             }
         }
-        else if (markerE == null)
+        else if (markerS == null)
         {
-
-            markerE = mMap.addMarker(options);
+            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            markerS = mMap.addMarker(options);
             createPath();
+
         }
+
+
         else if(markerE != null && markerS != null)
         {
             removeEverything();
@@ -567,7 +597,7 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                     .position(new LatLng(lat, lng));
             options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             markerS = mMap.addMarker(options);
-            //Toast.makeText(this,"Start : "+markerS.getPosition().latitude+","+markerS.getPosition().longitude,Toast.LENGTH_LONG).show();
+
         }
         if (!endPos.equals(""))
         {
@@ -580,7 +610,16 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                     .position(new LatLng(lat, lng));
 
             markerE = mMap.addMarker(options);
-            //Toast.makeText(this,"End : "+markerE.getPosition().latitude+","+markerE.getPosition().longitude,Toast.LENGTH_LONG).show();
+
+        }
+
+        if(markerE != null)
+        {
+            gotoLocation(markerE.getPosition().latitude, markerE.getPosition().longitude, (float)16.5);
+        }
+        else if(markerS != null)
+        {
+            gotoLocation(markerS.getPosition().latitude, markerS.getPosition().longitude, (float)16.5);
         }
 
         if (markerE != null && markerS != null)
@@ -605,7 +644,19 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
 
         TextView tv = (TextView) findViewById(R.id.editText);
         String searchString = (tv.getText().toString()).trim();
-        //Toast.makeText(this, "Searching for: " + searchString, Toast.LENGTH_SHORT).show();
+
+        //write to history
+        try
+        {
+            if(!h.repeated(searchString))
+            {
+                h.addHistory(searchString);
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         LocationData lcd=new LocationData();
         Building building=lcd.getLocation(searchString);
@@ -614,7 +665,7 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
             lat = building.getLat();
             lng = building.getLng();
             Toast.makeText(this, lat + "," + lng, Toast.LENGTH_SHORT).show();
-            gotoLocation(lat, lng, 17);
+            gotoLocation(lat, lng, (float)16.5);
             addMarker(lat, lng);
         }
 
@@ -630,13 +681,13 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
                 // getLocality() will return the name of the location in the Address object
                 String locality = add.getLocality();
                 String feature = add.getFeatureName();
-                //Toast.makeText(this, "Found: " + locality + feature, Toast.LENGTH_SHORT).show();
+
                 //ready to change the location that map show
                 lat = add.getLatitude();
                 lng = add.getLongitude();
 
                 Toast.makeText(this, lat + "," + lng, Toast.LENGTH_SHORT).show();
-                gotoLocation(lat, lng, 17);
+                gotoLocation(lat, lng, (float)16.5);
                 addMarker(lat, lng);
             } else
             {
@@ -655,11 +706,11 @@ public class mapActivity extends AppCompatActivity implements GoogleApiClient.Co
         LatLngBounds newarkBounds = new LatLngBounds(
                 new LatLng(34.235551, -118.533768),       // South west corner
                 new LatLng(34.257127, -118.523552));      // North east corner
-        GroundOverlayOptions newarkMap = new GroundOverlayOptions()
+                newarkMap = new GroundOverlayOptions()
                 .image(BitmapDescriptorFactory.fromResource(R.drawable.map3))
                 .positionFromBounds(newarkBounds);
 
 // Add an overlay to the map, retaining a handle to the GroundOverlay object.
-        GroundOverlay imageOverlay = mMap.addGroundOverlay(newarkMap);
+        imageOverlay = mMap.addGroundOverlay(newarkMap);
     }
 }

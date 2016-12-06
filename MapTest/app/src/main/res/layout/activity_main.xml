@@ -13,7 +13,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_pickUp"
+        android:text="@string/start"
         android:id="@+id/pickup"
         android:textIsSelectable="false"
         android:layout_alignParentTop="true"
@@ -48,7 +48,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_dropOff"
+        android:text="@string/destination"
         android:id="@+id/dropoff"
         android:textIsSelectable="false"
         android:layout_below="@+id/pickUp_spinner"
@@ -65,13 +65,31 @@
         android:layout_centerHorizontal="true"/>
 
     <Button
+        android:text="History search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/HistorySearchBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="29dp"/>
+
+    <Button
         android:text="@string/Sports_Event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="17dp"
-        android:id="@+id/button2"
-        android:layout_below="@+id/button"
+        android:id="@+id/sportsEventBtn"
 
-        android:layout_centerHorizontal="true"/>
+        android:layout_above="@+id/HistorySearchBtn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:text="Search by function"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchByFunction"
+        android:layout_above="@+id/sportsEventBtn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"/>
 
 </RelativeLayout>

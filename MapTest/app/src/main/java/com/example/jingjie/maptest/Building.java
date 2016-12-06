@@ -25,6 +25,35 @@ public class Building
 
     }
 
+    //index 6:
+    //1, Building
+    //2, TeachingBuilding
+    //3, ParkingBuilding
+    //4, Restaurant
+    public static Building buildingFactory(String[] str)
+    {
+        Building returnBuilding=null;
+        switch (Integer.parseInt(str[6]))
+        {
+            case 1:
+                returnBuilding=new Building(str);
+                break;
+            case 2:
+                returnBuilding=new TeachingBuilding(str);
+                break;
+            case 3:
+                returnBuilding=new ParkingBuilding(str);
+                break;
+            case 4:
+                returnBuilding=new Restaurant(str);
+                break;
+        }
+        return returnBuilding;
+    }
+
+
+
+
     public double getLat()
     {
         return lat;
@@ -83,19 +112,43 @@ class TeachingBuilding extends Building
 
 }
 
-class parkingBuilding extends Building
+class ParkingBuilding extends Building
 {
-    boolean isStudentParking;
-    String employeeOnly="";
-
-    public parkingBuilding(String[] str)
+    boolean studentParking;
+    public ParkingBuilding(String[] str)
     {
-
+        super(str);
+        studentParking="true".equals(str[4]);
     }
 
+    public boolean isStudentParking()
+    {
+        return studentParking;
+    }
+    public String getSearchKey()
+    {
+        return super.getSearchKey()+getAbbr();
+    }
 }
 
-class restaurant extends Building
+class Restaurant extends Building
 {
-
+    boolean isMeal=true;
+    public Restaurant(String[] str)
+    {
+        super(str);
+        if(str[4].equals("0"))
+        {
+            isMeal=true;
+        }
+        else if(str[4].equals("1"))
+        {
+            isMeal=false;
+        }
+    }
+    public boolean isMeal()
+    {
+        return isMeal;
+    }
 }
+
