@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         addListenerOnButton();
-        addListenerOnButton2();
+        //addListenerOnButton2();
         addListenerOnButton3();
         addListenerOnButton4();
 
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    /*
     public void addListenerOnButton2(){
         final Context context = this;
         button2 = (Button)findViewById(R.id.sportsEventBtn);
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    */
     public void addListenerOnButton3(){
         final Context context = this;
         button3 = (Button)findViewById(R.id.HistorySearchBtn);

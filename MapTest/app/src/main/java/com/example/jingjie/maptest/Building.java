@@ -51,9 +51,6 @@ public class Building
         return returnBuilding;
     }
 
-
-
-
     public double getLat()
     {
         return lat;

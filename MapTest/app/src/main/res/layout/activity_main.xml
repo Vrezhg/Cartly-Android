@@ -13,7 +13,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start"
+        android:text="@string/select_pickUp"
         android:id="@+id/pickup"
         android:textIsSelectable="false"
         android:layout_alignParentTop="true"
@@ -48,7 +48,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/destination"
+        android:text="@string/select_dropOff"
         android:id="@+id/dropoff"
         android:textIsSelectable="false"
         android:layout_below="@+id/pickUp_spinner"
@@ -64,15 +64,7 @@
         android:layout_below="@+id/dropOff_spinner"
         android:layout_centerHorizontal="true"/>
 
-    <Button
-        android:text="History search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/HistorySearchBtn"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="29dp"/>
-
+    <!--
     <Button
         android:text="@string/Sports_Event"
         android:layout_width="wrap_content"
@@ -82,7 +74,8 @@
         android:layout_above="@+id/HistorySearchBtn"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="12dp"/>
-
+    -->
+    <!--
     <Button
         android:text="Search by function"
         android:layout_width="wrap_content"
@@ -91,5 +84,22 @@
         android:layout_above="@+id/sportsEventBtn"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="12dp"/>
+    -->
+    <Button
+        android:text="Search by function"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchByFunction"
+        android:layout_below="@+id/button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"/>
 
+    <Button
+        android:text="History search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/HistorySearchBtn"
+        android:layout_below="@+id/searchByFunction"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"/>
 </RelativeLayout>
