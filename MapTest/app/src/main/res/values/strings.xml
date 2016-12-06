@@ -11,6 +11,12 @@
     <string name="create_button">create_button</string>
     <string name="select_dropOff">select_dropOff</string>
     <string name="select_pickUp">select_pickUp</string>
+    <string name="enter_location">Enter location:</string>
+    <string name="Sports_Event">Sports Event</string>
+    <string name="navigation">navigation</string>
+    <string name="MattaMap">MattaMap</string>
+    <string name="start">Start</string>
+    <string name="destination">Destination</string>
     <string-array name="start_array">
         <item></item>
         <item>Oviatt Library</item>
@@ -26,5 +32,9 @@
         <item>Jacaranda Hall</item>
         <item>Sierra Hall</item>
         <item>Live Oak Hall</item>
+    </string-array>
+
+    <string-array name="history_array">
+        <item></item>
     </string-array>
 </resources>
