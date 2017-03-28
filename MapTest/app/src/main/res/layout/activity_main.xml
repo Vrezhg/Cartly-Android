@@ -1,40 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.jingjie.carly.MainActivity">
 
-                tools:context="com.example.jingjie.maptest.MainActivity">
 
-    <TextView
+    <Button
+        android:text="Register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/select_pickUp"
-        android:id="@+id/pickup"
-        android:textIsSelectable="false"
-        android:layout_alignParentTop="true"
+        android:id="@+id/registerBtn"
+        android:layout_above="@+id/testFB"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="140dp" />
+        android:layout_marginBottom="19dp"/>
 
-    <Spinner
-        android:id="@+id/pickUp_spinner"
-        android:layout_width="fill_parent"
+    <Button
+        android:text="TestFB"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pickup"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:id="@+id/testFB"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/registerBtn"
+        android:layout_alignStart="@+id/registerBtn"/>
 
-    <Spinner
-        android:id="@+id/dropOff_spinner"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/LogTV"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dropoff"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="Login/Register"
+        android:textSize="25dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/imageView"
+        android:layout_centerHorizontal="true"/>
 
     <ImageView
         android:layout_width="120dp"
@@ -43,63 +47,42 @@
         android:id="@+id/imageView"
         android:src="@mipmap/ic_launcher"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/select_dropOff"
-        android:id="@+id/dropoff"
-        android:textIsSelectable="false"
-        android:layout_below="@+id/pickUp_spinner"
-        android:layout_alignLeft="@+id/pickup"
-        android:layout_alignStart="@+id/pickup"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/goToMap"
-        android:id="@+id/button"
-        android:gravity="center_vertical"
-        android:layout_below="@+id/dropOff_spinner"
-        android:layout_centerHorizontal="true"/>
-
-    <!--
-    <Button
-        android:text="@string/Sports_Event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/sportsEventBtn"
-
-        android:layout_above="@+id/HistorySearchBtn"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="12dp"/>
-    -->
-    <!--
-    <Button
-        android:text="Search by function"
+        android:layout_marginTop="11dp"/>
+
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/searchByFunction"
-        android:layout_above="@+id/sportsEventBtn"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:layout_below="@+id/LogTV"
+        android:layout_alignTop="@+id/LogTV"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="12dp"/>
-    -->
-    <Button
-        android:text="Search by function"
+        android:layout_marginTop="38dp"
+        android:id="@+id/etEmail"
+        android:hint="            Enter Email"/>
+
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/searchByFunction"
-        android:layout_below="@+id/button"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp"/>
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/etPassword"
+        android:hint="  Enter Password"
+        android:layout_below="@+id/etEmail"
+        android:layout_alignLeft="@+id/etEmail"
+        android:layout_alignStart="@+id/etEmail"
+        android:layout_marginTop="11dp"/>
 
     <Button
-        android:text="History search"
+        android:text="Login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/HistorySearchBtn"
-        android:layout_below="@+id/searchByFunction"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="18dp"/>
+        android:layout_marginBottom="15dp"
+        android:id="@+id/LoginBtn"
+        android:layout_above="@+id/registerBtn"
+        android:layout_alignLeft="@+id/registerBtn"
+        android:layout_alignStart="@+id/registerBtn"/>
+
+
 </RelativeLayout>
