@@ -12,24 +12,6 @@
     tools:context="com.example.jingjie.carly.MainActivity">
 
 
-    <Button
-        android:text="Register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/registerBtn"
-        android:layout_above="@+id/testFB"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="19dp"/>
-
-    <Button
-        android:text="TestFB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/testFB"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/registerBtn"
-        android:layout_alignStart="@+id/registerBtn"/>
-
     <TextView
         android:id="@+id/LogTV"
         android:layout_width="wrap_content"
@@ -78,11 +60,20 @@
         android:text="Login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
         android:id="@+id/LoginBtn"
-        android:layout_above="@+id/registerBtn"
+        android:layout_below="@+id/etPassword"
         android:layout_alignLeft="@+id/registerBtn"
-        android:layout_alignStart="@+id/registerBtn"/>
+        android:layout_alignStart="@+id/registerBtn"
+        android:layout_marginTop="20dp"/>
+
+    <Button
+        android:text="Register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/registerBtn"
+        android:layout_below="@+id/LoginBtn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"/>
 
 
 </RelativeLayout>

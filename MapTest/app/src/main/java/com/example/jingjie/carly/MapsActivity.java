@@ -38,8 +38,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DatabaseReference target;
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
     private int positionInLine=0;
+    private int currNumOfPeople=0;
     private String prevStation="";
     private boolean inline=false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -80,6 +82,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         */
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+        {
+            @Override
+            public boolean onMarkerClick(Marker marker)
+            {
+
+                numOfPeopleInCurrMarker(marker);
+
+                //marker.setSnippet("There are "+currNumOfPeople+" people in the line.");
+
+                return true;
+            }
+        }
+        );
+
+        //when user click info window,add user to the queue
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker arg0)
@@ -117,6 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //Toast.makeText(MapsActivity.this, positionInLine + " people before you.", Toast.LENGTH_SHORT).show();
                     }
                 }
+                arg0.hideInfoWindow();
             }
         });
     }
@@ -139,7 +159,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         Intent i = getIntent();
         userId=i.getStringExtra("userID");
-        Toast.makeText(MapsActivity.this,userId,Toast.LENGTH_LONG).show();
+        //show user id just for test
+        //Toast.makeText(MapsActivity.this,userId,Toast.LENGTH_LONG).show();
     }
     private void removeFromQueue()
     {
@@ -147,9 +168,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         target=null;
         prevStation="";
     }
-    private void currTargetPosition()
+    private void numOfPeopleInCurrMarker(Marker marker)
     {
+        final Marker marker2=marker;
+        String currStation = marker.getTitle();
 
+        String detial = currStation.split(" ")[0] + "-" + currStation.split(" ")[1];
+        DatabaseReference currTarget = mDatabase.child("Queue").child(detial);
+        currTarget.addListenerForSingleValueEvent(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                currNumOfPeople=(int)(dataSnapshot.getChildrenCount());
+                marker2.setSnippet((int)(dataSnapshot.getChildrenCount())+" people in the line. Click to add.");
+                marker2.showInfoWindow();
+                //Toast.makeText(MapsActivity.this,"current station is "+dataSnapshot.getKey()+" num of people is "+(int)(dataSnapshot.getChildrenCount()),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+
+            }
+        });
+
+        /*
         DatabaseReference temp=target.getParent();
         temp.addListenerForSingleValueEvent(new ValueEventListener()
         {
@@ -166,6 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+        */
     }
     private void getCurrPosition()
     {
@@ -209,7 +254,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 if(inline)
                     target=temp[1];
-                Toast.makeText(MapsActivity.this,"position is "+positionInLine + " in "+prevStation,Toast.LENGTH_SHORT).show();
+                if(inline)
+                    Toast.makeText(MapsActivity.this,"position is "+positionInLine + " in "+prevStation,Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -219,4 +265,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
+
+
 }
