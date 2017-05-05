@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,6 +44,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int currNumOfPeople=0;
     private String prevStation="";
     private boolean inline=false;
+    private TextView tv_ui;
+    private Button leaveButton;
+    private Button refreshButton;
 
 
     @Override
@@ -55,7 +61,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //get userId
         getUserID();
         getCurrPosition();
-
+        tv_ui=(TextView)findViewById(R.id.tv_ui);
+        addButton();
     }
 
 
@@ -76,27 +83,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setRotateGesturesEnabled(false);
         AddMarker.addStation();
         AddMarker.addMarkerToMap(mMap);
-        /*
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        */
+
+        AddMarker.drawLine(googleMap);
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
         {
             @Override
             public boolean onMarkerClick(Marker marker)
             {
-
                 numOfPeopleInCurrMarker(marker);
-
-                //marker.setSnippet("There are "+currNumOfPeople+" people in the line.");
-
                 return true;
             }
-        }
-        );
+        });
 
         //when user click info window,add user to the queue
         googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -106,22 +104,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //System.out.println();
                 if(target==null)
                 {
-                    //currTargetPosition();
                     prevStation = arg0.getTitle();
                     String detial = prevStation.split(" ")[0] + "-" + prevStation.split(" ")[1];
                     target = mDatabase.child("Queue").child(detial).push();
                     target.setValue(userId);
-                    //currTargetPosition();
                     getCurrPosition();
-                    //Toast.makeText(MapsActivity.this, positionInLine+" people before you.", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
                     if(prevStation.equals(arg0.getTitle()))
                     {
-                        //currTargetPosition();
                         getCurrPosition();
-                        //Toast.makeText(MapsActivity.this, positionInLine + " people before you.", Toast.LENGTH_SHORT).show();
                     }
                     else
                     {
@@ -131,9 +124,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String detial = prevStation.split(" ")[0] + "-" + prevStation.split(" ")[1];
                         target = mDatabase.child("Queue").child(detial).push();
                         target.setValue(userId);
-                        //currTargetPosition();
                         getCurrPosition();
-                        //Toast.makeText(MapsActivity.this, positionInLine + " people before you.", Toast.LENGTH_SHORT).show();
                     }
                 }
                 arg0.hideInfoWindow();
@@ -159,14 +150,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         Intent i = getIntent();
         userId=i.getStringExtra("userID");
-        //show user id just for test
-        //Toast.makeText(MapsActivity.this,userId,Toast.LENGTH_LONG).show();
     }
     private void removeFromQueue()
     {
-        target.removeValue();
-        target=null;
-        prevStation="";
+        if(target!=null)
+        {
+            target.removeValue();
+            target = null;
+            prevStation = "";
+            tv_ui.setText("Not in line.\nClick marker to add");
+        }
     }
     private void numOfPeopleInCurrMarker(Marker marker)
     {
@@ -183,7 +176,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 currNumOfPeople=(int)(dataSnapshot.getChildrenCount());
                 marker2.setSnippet((int)(dataSnapshot.getChildrenCount())+" people in the line. Click to add.");
                 marker2.showInfoWindow();
-                //Toast.makeText(MapsActivity.this,"current station is "+dataSnapshot.getKey()+" num of people is "+(int)(dataSnapshot.getChildrenCount()),Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -192,25 +184,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
-
-        /*
-        DatabaseReference temp=target.getParent();
-        temp.addListenerForSingleValueEvent(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                positionInLine=(int)(dataSnapshot.getChildrenCount());
-                Toast.makeText(MapsActivity.this,positionInLine+"",Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
-            }
-        });
-        */
     }
     private void getCurrPosition()
     {
@@ -237,11 +210,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         {
                             inline=true;
                             temp[1]=snapshotInner.getRef();
-                            ////////////////////////////////////////////////////////////////////////////////////
-                            //positionInLine=numOfChild[0]-positionInLine+1;
                             break;
                         }
-                        //positionInLine++;
                         temp[1]=null;
 
                     }
@@ -250,12 +220,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         prevStation=snapshot.getKey().split("-")[0]+" "+snapshot.getKey().split("-")[1];
                         break;
                     }
-                    //positionInLine=0;
                 }
                 if(inline)
                     target=temp[1];
                 if(inline)
-                    Toast.makeText(MapsActivity.this,"position is "+positionInLine + " in "+prevStation,Toast.LENGTH_LONG).show();
+                {
+                    Toast.makeText(MapsActivity.this, "position is " + positionInLine + " in " + prevStation, Toast.LENGTH_LONG).show();
+                    tv_ui.setText("position is " + positionInLine + " in " + prevStation);
+                }
             }
 
             @Override
@@ -265,6 +237,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
-
-
+    private void addButton()
+    {
+        addLeaveButton();
+        addRefreshButton();
+    }
+    private void addLeaveButton()
+    {
+        leaveButton=(Button)findViewById(R.id.leave);
+        leaveButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                removeFromQueue();
+            }
+        });
+    }
+    private void addRefreshButton()
+    {
+        refreshButton=(Button)findViewById(R.id.refresh);
+        refreshButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                getCurrPosition();
+            }
+        });
+    }
 }

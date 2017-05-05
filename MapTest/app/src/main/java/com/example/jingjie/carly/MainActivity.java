@@ -1,14 +1,17 @@
 package com.example.jingjie.carly;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.multidex.MultiDex;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -121,10 +124,7 @@ public class MainActivity extends AppCompatActivity
                         else
                         {
                             userID=task.getResult().getUser().getUid();
-                            //go to map with userId
-                            Intent i=new Intent(MainActivity.this,MapsActivity.class);
-                            i.putExtra("userID",userID);
-                            startActivity(i);
+                            getIsDriver();
                         }
                     }
                 });
@@ -134,106 +134,37 @@ public class MainActivity extends AppCompatActivity
 
         });
     }
-
-    /*
-
-    private void addGoToMapBtnListener()
+    private void getIsDriver()
     {
-        goMapBtn=(Button) findViewById(R.id.toMap);
-        goMapBtn.setOnClickListener(new View.OnClickListener()
+        DatabaseReference dr= mDatabase.child("Users").child(userID).child("isDriver");
+        dr.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
-            public void onClick(View view)
+            public void onDataChange(DataSnapshot dataSnapshot)
             {
-                Intent i=new Intent(MainActivity.this,MapsActivity.class);
-                startActivity(i);
-            }
-        });
-    }
-    private void addTestFBBtnListener()
-    {
-        testFBBtn=(Button) findViewById(R.id.testFB);
-        testFBBtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener()
+                //Toast.makeText(MainActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
+                if(dataSnapshot.getValue().toString().equals("true"))
                 {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot)
-                    {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                            Log.i("Child", snapshot.getValue().toString());
-                        }
+                    Intent i=new Intent(MainActivity.this,DriverMapActivity.class);
+                    i.putExtra("userID",userID);
+                    startActivity(i);
 
-                        if (dataSnapshot.getChildrenCount() == 0){
-                            Log.i("no children", " no children");
-                        }
-                    }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError)
-                    {
-
-                    }
-                });
+                else
+                {
+                    Intent i=new Intent(MainActivity.this,MapsActivity.class);
+                    i.putExtra("userID",userID);
+                    startActivity(i);
+                }
             }
-        });
-    }
-    private void addUserBtnListener()
-    {
-        addUserBtn=(Button)findViewById(R.id.addUserBtn);
-        addUserBtn.setOnClickListener(new View.OnClickListener()
-        {
+
             @Override
-            public void onClick(View view)
+            public void onCancelled(DatabaseError databaseError)
             {
 
-                final User u=new User("false","06123641zjj@gmail.com");
-
-                final FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                mAuth.createUserWithEmailAndPassword(u.email, "123456")
-                        .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d("blah", "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
-                                if (!task.isSuccessful()) {
-                                    Toast.makeText(MainActivity.this, task.getException().getLocalizedMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    // success
-                                    String userId = task.getResult().getUser().getUid();
-                                    mDatabase.child(getString(R.string.Users)).child(userId).setValue(u);
-
-                                    if (mAuth.getCurrentUser() != null) {
-                                        FirebaseUser user = mAuth.getCurrentUser();
-                                        mDatabase.child(getString(R.string.Users)).child(user.getUid()).child("email").addListenerForSingleValueEvent(new ValueEventListener()
-                                        {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot)
-                                            {
-                                                Toast.makeText(MainActivity.this, dataSnapshot.getValue().toString(), Toast.LENGTH_SHORT).show();
-                                            }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError)
-                                            {
-
-                                            }
-                                        });
-                                    }
-                                }
-                                // ...
-                            }
-                        });
             }
         });
-
     }
-    */
+
 }
