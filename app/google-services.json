@@ -1,0 +1,113 @@
+{
+  "project_info": {
+    "project_number": "338486626128",
+    "firebase_url": "https://cartly-be9e0.firebaseio.com",
+    "project_id": "cartly-be9e0",
+    "storage_bucket": "cartly-be9e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338486626128:android:882546e343b1283f",
+        "android_client_info": {
+          "package_name": "com.example.jingjie.maptest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338486626128-1nfg80phae4qb6inal3uo7tgoeutf2o0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jingjie.maptest",
+            "certificate_hash": "4FCB7B2264498C75A8FFDB826072310B90361AF2"
+          }
+        },
+        {
+          "client_id": "338486626128-65ph8onoso53hn27clqb2enehpm3mv33.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCatsmjDo9wuDkrHP4jdwixROSUIpzSkMo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338486626128-eleept7nunjde4f1u8tmmodi69bi8ndf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "Revenge-Apps-Inc.Cartly"
+              }
+            },
+            {
+              "client_id": "338486626128-65ph8onoso53hn27clqb2enehpm3mv33.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338486626128:android:eb7cf652d1dc2ea6",
+        "android_client_info": {
+          "package_name": "com.example.jingjie.carly"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338486626128-32sg8dcrf83disog20jeh2emd4m9orjo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.jingjie.carly",
+            "certificate_hash": "4FCB7B2264498C75A8FFDB826072310B90361AF2"
+          }
+        },
+        {
+          "client_id": "338486626128-65ph8onoso53hn27clqb2enehpm3mv33.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCatsmjDo9wuDkrHP4jdwixROSUIpzSkMo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338486626128-eleept7nunjde4f1u8tmmodi69bi8ndf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "Revenge-Apps-Inc.Cartly"
+              }
+            },
+            {
+              "client_id": "338486626128-65ph8onoso53hn27clqb2enehpm3mv33.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

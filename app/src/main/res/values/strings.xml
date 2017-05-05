@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Carly</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="auth_failed">Failed</string>
+    <string name="succeeded">Success</string>
+    <string name="Users">Users</string>
+    <string name="Queue">Queue</string>
+</resources>

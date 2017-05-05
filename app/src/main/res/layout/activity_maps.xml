@@ -1,0 +1,59 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_map_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.jingjie.carly.MapsActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="120px"
+        android:id="@+id/activity_map_ui"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:text="Not in line.\nClick marker to add"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/tv_ui"
+            android:layout_weight="1.43"
+            android:textSize="16sp"/>
+
+        <Button
+            android:text="refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/refresh"
+            android:textSize="12sp"
+            />
+
+        <Button
+            android:text="leave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/leave"
+            android:textSize="11sp"
+            />
+
+    </LinearLayout>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:map="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/map"
+              android:name="com.google.android.gms.maps.SupportMapFragment"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              map:cameraTargetLat="34.2400549"
+              map:cameraTargetLng="-118.5290737"
+              map:cameraZoom="16"
+              tools:context="com.example.jingjie.carly.MapsActivity"
+              android:layout_below="@+id/activity_map_ui"/>
+
+
+</RelativeLayout>
